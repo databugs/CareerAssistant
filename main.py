@@ -5,7 +5,7 @@ import os
 from fastapi import FastAPI, Request, Response, HTTPException, status
 
 from telegram import Update
-from telegram.ext import (Application, CommandHandler,
+from telegram.ext import (ApplicationBuilder, CommandHandler,
                           ConversationHandler, MessageHandler, filters, ContextTypes
                           )
 from pydantic import BaseModel, validator
@@ -26,7 +26,7 @@ class Job(BaseModel):
 app = FastAPI()
 logging.basicConfig(level=logging.INFO)
     
-bot = Application.builder().token(TELEGRAM_TOKEN).build()
+bot = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 
 @app.post('/', status_code=status.HTTP_202_ACCEPTED)
 async def telegram_webhook(request: Request):
@@ -39,11 +39,7 @@ async def telegram_webhook(request: Request):
         update: Update = Update.de_json(update_dict, bot)
         logging.info(f"Received Telegram update: {update}")
         logging.info(f"Type of Telegram Update: {type(update)}")
-        try:
-            await bot.initialize()
-            await bot.process_update(update)
-        finally:
-            await bot.shutdown()
+        await bot.process_update(update)
     except Exception as e:
         logging.error(f"Failed to parse update: {e}")
     return Response(status_code=status.HTTP_202_ACCEPTED)
