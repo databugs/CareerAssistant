@@ -39,7 +39,11 @@ async def telegram_webhook(request: Request):
         update = Update.de_json(update_dict, bot)
         logging.info(f"Received Telegram update: {update}")
         logging.info(f"Type of Telegram Update: {type(update)}")
-        await bot.process_update(update)
+        try:
+            await bot.initialize()
+            await bot.process_update(update)
+        finally:
+            await bot.shutdown()
     except Exception as e:
         logging.error(f"Failed to parse update: {e}")
     return Response(status_code=status.HTTP_202_ACCEPTED)
