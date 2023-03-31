@@ -5,7 +5,7 @@ import os
 from fastapi import FastAPI, Request, Response, HTTPException, status
 
 from telegram import Update
-from telegram.ext import (ApplicationBuilder, CommandHandler,
+from telegram.ext import (Application, CommandHandler,
                           ConversationHandler, MessageHandler, filters, ContextTypes
                           )
 from pydantic import BaseModel, validator
@@ -24,10 +24,9 @@ class Job(BaseModel):
 
 
 app = FastAPI()
-    
-bot = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
-
 logging.basicConfig(level=logging.INFO)
+    
+bot = Application.builder().token(TELEGRAM_TOKEN).build()
 
 @app.post('/', status_code=status.HTTP_202_ACCEPTED)
 async def telegram_webhook(request: Request):
