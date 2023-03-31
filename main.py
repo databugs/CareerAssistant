@@ -6,7 +6,7 @@ from fastapi import FastAPI, Request, Response, HTTPException, status
 
 from telegram import Update
 from telegram.ext import (ApplicationBuilder, CommandHandler,
-                          ConversationHandler, MessageHandler, filters, ContextTypes
+                          ConversationHandler, MessageHandler, filters, ContextTypes, BaseHandler
                           )
 from pydantic import BaseModel, validator
 
@@ -39,7 +39,11 @@ async def telegram_webhook(request: Request):
         update: Update = Update.de_json(update_dict, bot)
         logging.info(f"Received Telegram update: {update}")
         logging.info(f"Type of Telegram Update: {type(update)}")
-        await bot.process_update(update)
+        try:
+            bot.initialize()
+            await bot.process_update(update)
+        finally:
+            bot.shutdown()
     except Exception as e:
         logging.error(f"Failed to parse update: {e}")
     return Response(status_code=status.HTTP_202_ACCEPTED)
@@ -85,7 +89,7 @@ async def cancel(update: Update, context):
     await update.message.reply_text('Bye! I canceled the conversation.')
     return ConversationHandler.END
 
-async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Log Errors caused by Updates."""
     logging.debug('Update "%s" caused error "%s"', update, context.error)
 
@@ -102,4 +106,4 @@ conversation_handler = ConversationHandler(
 )
 
 bot.add_handler(conversation_handler)
-bot.add_handler(error)
+bot.add_error_handler(error_handler)
