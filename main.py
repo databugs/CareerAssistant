@@ -25,30 +25,8 @@ class Job(BaseModel):
         return value
 
 
-app = FastAPI()
-logging.basicConfig(level=logging.INFO)
-    
-bot = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 
-@app.post('/', status_code=status.HTTP_202_ACCEPTED)
-async def telegram_webhook(request: Request):
-    payload = await request.body()
-    if not payload:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Empty payload")
-    json_payload = payload.decode('utf-8')
-    try:
-        update_dict = json.loads(json_payload)
-        update: Update = Update.de_json(update_dict, bot)
-        logging.info(f"Received Telegram update: {update}")
-        logging.info(f"Type of Telegram Update: {type(update)}")
-        try:
-            await bot.initialize()
-            await bot.process_update(update)
-        finally:
-            await bot.shutdown()
-    except Exception as e:
-        logging.error(f"Failed to parse update: {e}")
-    return Response(status_code=status.HTTP_202_ACCEPTED)
+logging.basicConfig(level=logging.INFO)
 
 # def send_action(action):
 #     """Sends `action` while processing func command."""
@@ -113,17 +91,45 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Log Errors caused by Updates."""
     logging.debug('Update "%s" caused error "%s"', update, context.error)
 
+async def main():
+    
+    app = FastAPI()
+    bot = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
+    
+    conversation_handler = ConversationHandler(
+        entry_points=[CommandHandler('start', start)],
+        states={
+            1: [MessageHandler(filters=filters.TEXT & (~filters.COMMAND), callback=job_title)],
+            2: [MessageHandler(filters=filters.TEXT & (~filters.COMMAND), callback=job_level)],
+            3: [MessageHandler(filters=filters.TEXT & (~filters.COMMAND), callback=industry)]
+        },
+        fallbacks=[CommandHandler('cancel', cancel)]
+        , per_user=True
+    )
 
-conversation_handler = ConversationHandler(
-    entry_points=[CommandHandler('start', start)],
-    states={
-        1: [MessageHandler(filters=filters.TEXT & (~filters.COMMAND), callback=job_title)],
-        2: [MessageHandler(filters=filters.TEXT & (~filters.COMMAND), callback=job_level)],
-        3: [MessageHandler(filters=filters.TEXT & (~filters.COMMAND), callback=industry)]
-    },
-    fallbacks=[CommandHandler('cancel', cancel)]
-    , per_user=True
-)
+    bot.add_handler(conversation_handler)
+    bot.add_error_handler(error_handler)
 
-bot.add_handler(conversation_handler)
-bot.add_error_handler(error_handler)
+    @app.post('/', status_code=status.HTTP_202_ACCEPTED)
+    async def telegram_webhook(request: Request):
+        payload = await request.body()
+        if not payload:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Empty payload")
+        json_payload = payload.decode('utf-8')
+        try:
+            update_dict = json.loads(json_payload)
+            update: Update = Update.de_json(update_dict, bot)
+            logging.info(f"Received Telegram update: {update}")
+            await bot.update_queue.put(
+                update
+            )
+        except Exception as e:
+            logging.error(f"Failed to parse update: {e}")
+        return Response(status_code=status.HTTP_202_ACCEPTED)
+    
+    async with bot:
+        await bot.start()
+        await bot.stop()
+        
+if __name__=="__main__":
+    main()
