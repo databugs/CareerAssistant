@@ -129,9 +129,9 @@ async def telegram_webhook(request: Request):
 # Start and run the application
 async def main(): 
     async with bot:
-        bot.start()
+        await bot.start()
         # when some shutdown mechanism is triggered:
-        bot.stop()
+        await bot.stop()
 
 if __name__=="__main__":     
     main()
