@@ -126,10 +126,12 @@ async def telegram_webhook(request: Request):
         logging.error(f"Failed to parse update: {e}")
     return Response(status_code=status.HTTP_202_ACCEPTED)
 
-async def main():
+# Start and run the application
+async def main(): 
     async with bot:
-        await bot.start()
-        await bot.stop()
+        bot.start()
+        # when some shutdown mechanism is triggered:
+        bot.stop()
 
-if __name__=="__main__":
+if __name__=="__main__":     
     main()
