@@ -1,19 +1,16 @@
 import logging
 import json
 import os
-#from functools import wraps
-
 from fastapi import FastAPI, Request, Response, HTTPException, status
-
-
 from telegram import Update
 from telegram.ext import (ApplicationBuilder, CommandHandler,
                           ConversationHandler, MessageHandler, filters, ContextTypes
                           )
 from pydantic import BaseModel, validator
+import asyncio
+
 
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
-
 class Job(BaseModel):
     title: str
 
@@ -28,27 +25,11 @@ class Job(BaseModel):
 
 logging.basicConfig(level=logging.INFO)
 
-# def send_action(action):
-#     """Sends `action` while processing func command."""
-
-    # def decorator(func):
-    #     @wraps(func)
-    #     async def command_func(update: Update, context: ContextTypes.DEFAULT_TYPE, *args, **kwargs):
-    #         await context.bot.send_chat_action(chat_id=update.effective_message.chat_id, action=action)
-    #         return await func(update, context,  *args, **kwargs)
-    #     return command_func
-    
-    # return decorator
-
-#send_typing_action = send_action(telegram.ChatAction.Typing)
-
-#@send_typing_action
 async def start(update: Update, context):
     """Welcome the user and ask for their job title."""
     await update.message.reply_text("Hi, I am The Data Alchemist, your AI assistant.\nI am here to help you get started with your career growth.\nPlease tell me your job title.")
     return 1
 
-#@send_typing_action
 async def job_title(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Save the job title and ask for the job level."""
     try:
@@ -61,7 +42,6 @@ async def job_title(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(error_message)
         return ConversationHandler.END
     
-#@send_typing_action
 async def job_level(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Save the job level and ask for the industry."""
     context.user_data['job_level'] = update.message.text
@@ -69,7 +49,6 @@ async def job_level(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Thanks. Finally, what industry are you looking to work in?")
     return 3
 
-#@send_typing_action
 async def industry(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Save the industry and display the gathered information."""
     context.user_data['industry'] = update.message.text
@@ -81,7 +60,6 @@ async def industry(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     return ConversationHandler.END
 
-#@send_typing_action
 async def cancel(update: Update, context):
     """Cancel the conversation."""
     await update.message.reply_text('Bye! I canceled the conversation.')
@@ -134,4 +112,4 @@ async def main():
         await bot.stop()
 
 if __name__=="__main__":     
-    main()
+    asyncio.run(main())
