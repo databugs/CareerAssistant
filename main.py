@@ -7,6 +7,7 @@ from telegram.ext import (ApplicationBuilder, CommandHandler,
                           ConversationHandler, MessageHandler, filters, ContextTypes
                           )
 from pydantic import BaseModel, validator
+from model import setup, custom_output_parser
 
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 SECRET_TOKEN = os.getenv('SECRET_TOKEN')
@@ -51,11 +52,11 @@ async def job_level(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def industry(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Save the industry and display the gathered information."""
     context.user_data['industry'] = update.message.text
-    #output = setup(job=context.user_data['job_title'], level=context.user_data['job_level'], industry=context.user_data['industry'])
-    #list_of_ideas = custom_output_parser(output)
-    #message = f'Here are 5 projects you can complete to take your career to the next level.\n\n{list_of_ideas[0]}\n\n{list_of_ideas[1]}\n\n{list_of_ideas[2]}\n\n{list_of_ideas[3]}\n\n{list_of_ideas[4]}\n\nGood Luck!'
+    output = setup(job=context.user_data['job_title'], level=context.user_data['job_level'], industry=context.user_data['industry'])
+    list_of_ideas = custom_output_parser(output)
+    message = f'Here are 5 projects you can complete to take your career to the next level.\n\n{list_of_ideas[0]}\n\n{list_of_ideas[1]}\n\n{list_of_ideas[2]}\n\n{list_of_ideas[3]}\n\n{list_of_ideas[4]}\n\nGood Luck!'
     await update.message.reply_text(
-        f"Here's the information I gathered: \nJob Title: {context.user_data['job_title'].title()}\nJob Level: {context.user_data['job_level'].title()}\nIndustry: {context.user_data['industry'].title()}"
+        f"Here's the information I gathered: \nJob Title: {context.user_data['job_title'].title()}\nJob Level: {context.user_data['job_level'].title()}\nIndustry: {context.user_data['industry'].title()}\n\n{message}"
     )
     return ConversationHandler.END
 
@@ -89,7 +90,7 @@ bot.add_error_handler(error_handler)
 @app.post('/', status_code=status.HTTP_202_ACCEPTED)
 async def telegram_webhook(request: Request):
     token = request.headers.get('X-Telegram-Bot-Api-Secret-Token')
-    if token != secret_token:
+    if token != SECRET_TOKEN:
         raise ValueError("Invalid Token. You are not allowed to use this service!")
     payload = await request.body()
     if not payload:
@@ -98,7 +99,6 @@ async def telegram_webhook(request: Request):
     try:
         update_dict = json.loads(json_payload)
         update: Update = Update.de_json(update_dict, bot)
-        logging.info(f"Received Telegram update: {update}")
         await bot.update_queue.put(update)
     except Exception as e:
         logging.error(f"Failed to parse update: {e}")
