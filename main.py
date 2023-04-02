@@ -7,10 +7,10 @@ from telegram.ext import (ApplicationBuilder, CommandHandler,
                           ConversationHandler, MessageHandler, filters, ContextTypes
                           )
 from pydantic import BaseModel, validator
-import asyncio
 
 
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
+secret_token = os.getenv('secret_token')
 class Job(BaseModel):
     title: str
 
@@ -20,7 +20,6 @@ class Job(BaseModel):
         if value.lower() not in valid_jobs:
             raise ValueError('Oops! Only Data Science and Analytics jobs are allowed for now! You can /start over!')
         return value
-
 
 
 logging.basicConfig(level=logging.INFO)
@@ -89,6 +88,9 @@ bot.add_error_handler(error_handler)
 
 @app.post('/', status_code=status.HTTP_202_ACCEPTED)
 async def telegram_webhook(request: Request):
+    token = request.headers.get('X-Telegram-Bot-Api-Secret-Token')
+    if token != secret_token:
+        raise ValueError("Invalid Token. You are not allowed to use this service!")
     payload = await request.body()
     if not payload:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Empty payload")
@@ -104,12 +106,9 @@ async def telegram_webhook(request: Request):
         logging.error(f"Failed to parse update: {e}")
     return Response(status_code=status.HTTP_202_ACCEPTED)
 
-# Start and run the application
-async def main(): 
-    async with bot:
-        await bot.start()
-        # when some shutdown mechanism is triggered:
-        await bot.stop()
 
-if __name__=="__main__":     
-    asyncio.run(main())
+   
+bot.run_webhook(
+    secret_token=secret_token,
+    webhook_url='https://careerassistant.onrender.com/'
+)
