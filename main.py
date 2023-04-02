@@ -108,7 +108,8 @@ async def telegram_webhook(request: Request):
 
 bot.run_webhook(
     webhook_url=WEBHOOK_URL,
-    secret_token=secret_token
+    secret_token=secret_token,
+    port=10000
     )
 
 #uvicorn.run(app)
