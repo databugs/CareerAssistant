@@ -107,8 +107,8 @@ async def telegram_webhook(request: Request):
     return Response(status_code=status.HTTP_202_ACCEPTED)
 
 
-   
-bot.run_webhook(
-    secret_token=secret_token,
-    webhook_url='https://careerassistant.onrender.com/'
-)
+if __name__=="__main__":   
+    bot.run_webhook(
+        secret_token=secret_token,
+        webhook_url='https://careerassistant.onrender.com/'
+    )
