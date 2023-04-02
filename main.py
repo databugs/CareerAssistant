@@ -7,6 +7,7 @@ from telegram.ext import (ApplicationBuilder, CommandHandler,
                           ConversationHandler, MessageHandler, filters, ContextTypes
                           )
 from pydantic import BaseModel, validator
+import asyncio
 
 
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
@@ -81,6 +82,13 @@ conversation_handler = ConversationHandler(
     , per_user=True
 )
 
+async def update_handler(update: Update):
+    global bot
+    # Your code to process the update goes here
+    # For example, you can call the conversation handler's handle_update method:
+    await conversation_handler.handle_update(update, bot)
+
+
 bot = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 bot.add_handler(conversation_handler)
 bot.add_error_handler(error_handler)
@@ -98,9 +106,7 @@ async def telegram_webhook(request: Request):
         update_dict = json.loads(json_payload)
         update: Update = Update.de_json(update_dict, bot)
         logging.info(f"Received Telegram update: {update}")
-        await bot.update_queue.put(
-            update
-        )
+        await asyncio.create_task(update_handler(update))
     except Exception as e:
         logging.error(f"Failed to parse update: {e}")
     return Response(status_code=status.HTTP_202_ACCEPTED)
