@@ -70,8 +70,6 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     
 app = FastAPI()
-bot = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
-
 conversation_handler = ConversationHandler(
     entry_points=[CommandHandler('start', start)],
     states={
@@ -83,6 +81,7 @@ conversation_handler = ConversationHandler(
     , per_user=True
 )
 
+bot = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 bot.add_handler(conversation_handler)
 bot.add_error_handler(error_handler)
 
