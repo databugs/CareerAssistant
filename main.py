@@ -7,11 +7,11 @@ from telegram.ext import (ApplicationBuilder, CommandHandler,
                           ConversationHandler, MessageHandler, filters, ContextTypes
                           )
 from pydantic import BaseModel, validator
-import asyncio
-
+import uvicorn
 
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 secret_token = os.getenv('secret_token')
+WEBHOOK_URL = os.getenv('WEBHOOK_URL')
 class Job(BaseModel):
     title: str
 
@@ -83,21 +83,9 @@ conversation_handler = ConversationHandler(
 )
 
 
-bot = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
+bot = ApplicationBuilder().token('5974846096:AAGBxeQ2fwTKbsoJ4qI5kISAdYGIALHQ5aI').build()
 bot.add_handler(conversation_handler)
 bot.add_error_handler(error_handler)
-
-async def update_handler(update: Update):
-    # Your code to process the update goes here
-    # For example, you can call the conversation handler's handle_update method:
-    result = conversation_handler.check_update(update)
-    await conversation_handler.handle_update(
-        update=update,
-        application= bot,
-        check_result=result,
-        context= ContextTypes.DEFAULT_TYPE
-        )
-
 
 @app.post('/', status_code=status.HTTP_202_ACCEPTED)
 async def telegram_webhook(request: Request):
@@ -112,7 +100,15 @@ async def telegram_webhook(request: Request):
         update_dict = json.loads(json_payload)
         update: Update = Update.de_json(update_dict, bot)
         logging.info(f"Received Telegram update: {update}")
-        await asyncio.create_task(update_handler(update))
+        await bot.update_queue.put(update)
     except Exception as e:
         logging.error(f"Failed to parse update: {e}")
     return Response(status_code=status.HTTP_202_ACCEPTED)
+
+
+bot.run_webhook(
+    webhook_url=WEBHOOK_URL,
+    secret_token=secret_token
+    )
+
+#uvicorn.run(app)
