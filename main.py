@@ -105,10 +105,3 @@ async def telegram_webhook(request: Request):
     except Exception as e:
         logging.error(f"Failed to parse update: {e}")
     return Response(status_code=status.HTTP_202_ACCEPTED)
-
-
-if __name__=="__main__":   
-    bot.run_webhook(
-        secret_token=secret_token,
-        webhook_url='https://careerassistant.onrender.com/'
-    )
