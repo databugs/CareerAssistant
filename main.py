@@ -7,10 +7,9 @@ from telegram.ext import (ApplicationBuilder, CommandHandler,
                           ConversationHandler, MessageHandler, filters, ContextTypes
                           )
 from pydantic import BaseModel, validator
-import uvicorn
 
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
-secret_token = os.getenv('secret_token')
+SECRET_TOKEN = os.getenv('SECRET_TOKEN')
 WEBHOOK_URL = os.getenv('WEBHOOK_URL')
 class Job(BaseModel):
     title: str
@@ -83,7 +82,7 @@ conversation_handler = ConversationHandler(
 )
 
 
-bot = ApplicationBuilder().token('5974846096:AAGBxeQ2fwTKbsoJ4qI5kISAdYGIALHQ5aI').build()
+bot = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 bot.add_handler(conversation_handler)
 bot.add_error_handler(error_handler)
 
@@ -108,8 +107,6 @@ async def telegram_webhook(request: Request):
 
 bot.run_webhook(
     webhook_url=WEBHOOK_URL,
-    secret_token=secret_token,
+    secret_token=SECRET_TOKEN,
     port=10000
     )
-
-#uvicorn.run(app)
