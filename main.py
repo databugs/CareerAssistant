@@ -90,7 +90,13 @@ bot.add_error_handler(error_handler)
 async def update_handler(update: Update):
     # Your code to process the update goes here
     # For example, you can call the conversation handler's handle_update method:
-    await conversation_handler.handle_update(update, bot)
+    result = conversation_handler.check_update(update)
+    await conversation_handler.handle_update(
+        update=update,
+        application= bot,
+        check_result=result,
+        context= ContextTypes.DEFAULT_TYPE
+        )
 
 
 @app.post('/', status_code=status.HTTP_202_ACCEPTED)
