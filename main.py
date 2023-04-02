@@ -82,16 +82,16 @@ conversation_handler = ConversationHandler(
     , per_user=True
 )
 
-async def update_handler(update: Update):
-    global bot
-    # Your code to process the update goes here
-    # For example, you can call the conversation handler's handle_update method:
-    await conversation_handler.handle_update(update, bot)
-
 
 bot = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 bot.add_handler(conversation_handler)
 bot.add_error_handler(error_handler)
+
+async def update_handler(update: Update):
+    # Your code to process the update goes here
+    # For example, you can call the conversation handler's handle_update method:
+    await conversation_handler.handle_update(update, bot)
+
 
 @app.post('/', status_code=status.HTTP_202_ACCEPTED)
 async def telegram_webhook(request: Request):
