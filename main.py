@@ -9,6 +9,8 @@ from telegram.ext import (ApplicationBuilder, CommandHandler,
                           )
 from pydantic import BaseModel, validator
 from model import setup, custom_output_parser
+import uvicorn
+import asyncio
 
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 SECRET_TOKEN = os.getenv('SECRET_TOKEN')
@@ -136,7 +138,7 @@ async def home():
         <div class="container">
             <h1 class="display-4">The Data Alchemist</h1>
             <p class="lead">Your AI assistant to help you get started with your career growth in Data Science and Analytics.</p>
-            <a href="https://t.me/your_bot_username?start=start" class="btn btn-primary">Get Started</a>
+            <a href="https://t.me/theguy?start=start" class="btn btn-primary">Get Started</a>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
     </body>
@@ -144,8 +146,19 @@ async def home():
     """
     return HTMLResponse(content=html_content, status_code=200)
 
-bot.run_webhook(
-    webhook_url=WEBHOOK_URL,
-    secret_token=SECRET_TOKEN,
-    port=10000
-    )
+
+async def telegram_runner():
+    bot.run_webhook(
+        webhook_url=WEBHOOK_URL,
+        secret_token=SECRET_TOKEN,
+        port=10000
+        )
+    
+async def fastapi_runner():
+    uvicorn.run(app, port=10000)
+
+async def main():
+    await asyncio.gather(fastapi_runner(), telegram_runner())
+    
+if __name__ == '__main__':
+    asyncio.run(main())
