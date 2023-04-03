@@ -3,10 +3,10 @@ from langchain.prompts import PromptTemplate
 from langchain.llms import OpenAI
 from pydantic import BaseModel, Field
 import os
-import logging
+#import logging
 
 # Set up logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
+#logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
 
 class ProjectIdeas(BaseModel):
     project_ideas: list[str] = Field(description="List of project ideas.")
@@ -24,7 +24,7 @@ def custom_output_parser(llm_output: str):
 def setup(job=None, level=None, industry=None):
     OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
-    logging.debug(f"OPENAI_API_KEY: {OPENAI_API_KEY is None}")
+    #logging.debug(f"OPENAI_API_KEY: {OPENAI_API_KEY is None}")
 
     format_instructions = output_parser.get_format_instructions()
 
@@ -60,10 +60,4 @@ def setup(job=None, level=None, industry=None):
 
     _input = prompt.format(job_title=job, level=level, industry=industry)
 
-    #logging.debug(f"Model input: {_input}")
-
-    output = model(_input)
-
-    #logging.debug(f"Model output: {output}")
-
-    return output
+    return model(_input)
