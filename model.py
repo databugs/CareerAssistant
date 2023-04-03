@@ -49,7 +49,7 @@ def setup(job=None, level=None, industry=None):
         partial_variables={"format_instructions": format_instructions}
     )
 
-    model = OpenAI(temperature=0.7)
+    model = OpenAI(temperature=0.7, openai_api_key=OPENAI_API_KEY)
 
     _input = prompt.format(job_title=job, level=level, industry=industry)
     return model(_input)
