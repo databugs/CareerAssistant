@@ -104,6 +104,9 @@ async def telegram_webhook(request: Request):
         logging.error(f"Failed to parse update: {e}")
     return Response(status_code=status.HTTP_202_ACCEPTED)
 
+@app.get('/')
+async def home():
+    return {"hello": "world"}
 
 bot.run_webhook(
     webhook_url=WEBHOOK_URL,
