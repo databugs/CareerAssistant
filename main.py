@@ -2,15 +2,13 @@ import logging
 import json
 import os
 from fastapi import FastAPI, Request, Response, HTTPException, status
-from fastapi.responses import HTMLResponse
+
 from telegram import Update
 from telegram.ext import (ApplicationBuilder, CommandHandler,
                           ConversationHandler, MessageHandler, filters, ContextTypes
                           )
 from pydantic import BaseModel, validator
 from model import setup, custom_output_parser
-import uvicorn
-import asyncio
 
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 SECRET_TOKEN = os.getenv('SECRET_TOKEN')
@@ -24,7 +22,6 @@ class Job(BaseModel):
         if value.lower() not in valid_jobs:
             raise ValueError('Oops! Only Data Science and Analytics jobs are allowed for now! You can /start over!')
         return value
-
 
 logging.basicConfig(level=logging.INFO)
 
@@ -75,7 +72,6 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Oops. Something went wrong!🥺"
     )
 
-    
 app = FastAPI()
 conversation_handler = ConversationHandler(
     entry_points=[CommandHandler('start', start)],
@@ -87,7 +83,6 @@ conversation_handler = ConversationHandler(
     fallbacks=[CommandHandler('cancel', cancel)]
     , per_user=True
 )
-
 
 bot = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 bot.add_handler(conversation_handler)
@@ -110,55 +105,8 @@ async def telegram_webhook(request: Request):
         logging.error(f"Failed to parse update: {e}")
     return Response(status_code=status.HTTP_202_ACCEPTED)
 
-@app.get("/home", response_class=HTMLResponse)
-async def home():
-    html_content = """
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>The Data Alchemist</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <style>
-            body {
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                min-height: 100vh;
-                background-color: #f8f9fa;
-            }
-            .container {
-                text-align: center;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h1 class="display-4">The Data Alchemist</h1>
-            <p class="lead">Your AI assistant to help you get started with your career growth in Data Science and Analytics.</p>
-            <a href="https://t.me/theguy?start=start" class="btn btn-primary">Get Started</a>
-        </div>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
-    </body>
-    </html>
-    """
-    return HTMLResponse(content=html_content, status_code=200)
-
-
-async def telegram_runner():
-    await bot.run_webhook(
-        webhook_url=WEBHOOK_URL,
-        secret_token=SECRET_TOKEN,
-        port=10000
-        )
-    
-async def fastapi_runner():
-    await uvicorn.run(app, port=10000)
-
-async def main():
-    await asyncio.gather(fastapi_runner(), telegram_runner())
-    
-if __name__ == '__main__':
-    asyncio.run(main())
+bot.run_webhook(
+    webhook_url=WEBHOOK_URL,
+    secret_token=SECRET_TOKEN,
+    port=10000
+    )
