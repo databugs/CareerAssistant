@@ -69,6 +69,9 @@ async def cancel(update: Update, context):
 async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Log Errors caused by Updates."""
     logging.debug('Update "%s" caused error "%s"', update, context.error)
+    await update.message.reply_text(
+        "Oops. Something went wrong!🥺"
+    )
 
     
 app = FastAPI()
