@@ -27,7 +27,7 @@ logging.basicConfig(level=logging.INFO)
 
 async def start(update: Update, context):
     """Welcome the user and ask for their job title."""
-    await update.message.reply_text("Hi, I am The Data Alchemist, your AI assistant.\nI am here to help you get started with your career growth.\nPlease tell me your job title.")
+    await update.message.reply_text("Hi, I am The Data Alchemist, your AI assistant.\n\nI am here to help you get started with your career growth.\n\nPlease tell me your job title.")
     return 1
 
 async def job_title(update: Update, context: ContextTypes.DEFAULT_TYPE):
