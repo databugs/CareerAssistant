@@ -148,14 +148,14 @@ async def home():
 
 
 async def telegram_runner():
-    bot.run_webhook(
+    await bot.run_webhook(
         webhook_url=WEBHOOK_URL,
         secret_token=SECRET_TOKEN,
         port=10000
         )
     
 async def fastapi_runner():
-    uvicorn.run(app, port=10000)
+    await uvicorn.run(app, port=10000)
 
 async def main():
     await asyncio.gather(fastapi_runner(), telegram_runner())
