@@ -14,7 +14,7 @@ class ProjectIdeas(BaseModel):
 output_parser = PydanticOutputParser(pydantic_object=ProjectIdeas)
 
 def custom_output_parser(llm_output: str):
-    logging.debug(f"LLM output: {llm_output}")
+    #logging.debug(f"LLM output: {llm_output}")
     if len(output_parser.parse(llm_output.replace("\n", "")).project_ideas)==5:
         return output_parser.parse(llm_output.replace("\n", "")).project_ideas
     ideas: ProjectIdeas = output_parser.parse(llm_output.replace('\n', ''))
@@ -54,16 +54,16 @@ def setup(job=None, level=None, industry=None):
         partial_variables={"format_instructions": format_instructions}
     )
 
-    logging.debug(f"Input variables: job_title={job}, level={level}, industry={industry}")
+    #logging.debug(f"Input variables: job_title={job}, level={level}, industry={industry}")
 
     model = OpenAI(temperature=0.7, openai_api_key=OPENAI_API_KEY)
 
     _input = prompt.format(job_title=job, level=level, industry=industry)
 
-    logging.debug(f"Model input: {_input}")
+    #logging.debug(f"Model input: {_input}")
 
     output = model(_input)
 
-    logging.debug(f"Model output: {output}")
+    #logging.debug(f"Model output: {output}")
 
     return output
