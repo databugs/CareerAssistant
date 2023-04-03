@@ -2,6 +2,7 @@ import logging
 import json
 import os
 from fastapi import FastAPI, Request, Response, HTTPException, status
+from fastapi.responses import HTMLResponse
 from telegram import Update
 from telegram.ext import (ApplicationBuilder, CommandHandler,
                           ConversationHandler, MessageHandler, filters, ContextTypes
@@ -104,9 +105,41 @@ async def telegram_webhook(request: Request):
         logging.error(f"Failed to parse update: {e}")
     return Response(status_code=status.HTTP_202_ACCEPTED)
 
-@app.get('/')
+@app.get("/", response_class=HTMLResponse)
 async def home():
-    return {"hello": "world"}
+    html_content = """
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>The Data Alchemist</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            body {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                background-color: #f8f9fa;
+            }
+            .container {
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1 class="display-4">The Data Alchemist</h1>
+            <p class="lead">Your AI assistant to help you get started with your career growth in Data Science and Analytics.</p>
+            <a href="https://t.me/your_bot_username?start=start" class="btn btn-primary">Get Started</a>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=html_content, status_code=200)
 
 bot.run_webhook(
     webhook_url=WEBHOOK_URL,
