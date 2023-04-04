@@ -3,10 +3,10 @@ from langchain.prompts import PromptTemplate
 from langchain.llms import OpenAI
 from pydantic import BaseModel, Field
 import os
-#import logging
+import logging
 
 # Set up logging
-#logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
 
 class ProjectIdeas(BaseModel):
     project_ideas: list[str] = Field(description="List of project ideas.")
@@ -75,7 +75,7 @@ def setup(job=None, level=None, industry=None):
 
     #logging.debug(f"Input variables: job_title={job}, level={level}, industry={industry}")
 
-    model = OpenAI(temperature=0.7, openai_api_key=OPENAI_API_KEY)
+    model = OpenAI(temperature=0.7, openai_api_key=OPENAI_API_KEY, max_tokens=1004)
 
     _input = prompt.format(job=job, level=level, industry=industry)
 
