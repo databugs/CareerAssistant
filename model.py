@@ -21,6 +21,20 @@ def custom_output_parser(llm_output: str):
     ideas_list = ideas.project_ideas[0]
     return [idea.strip() for idea in ideas_list.split(',')]
 
+def clean_output(output):
+        projects = output.strip()
+        project_one = ''.join(
+            project + '\n\n' for project in projects.split('\n\n')[:2][1].split('\n')[1:]
+            )
+        project_two = ''.join(
+            project.strip() + '\n\n' for project in projects.split('\n\n')[2:][1].split('\n')[1:]
+            )
+        title_one = projects.split('\n\n')[:2][0]
+        title_two = projects.split('\n\n')[2:][0]
+        project1 = ''.join(item +'\n\n' for item in [f'*{title_one}*', project_one])
+        project2 = ''.join(item +'\n\n' for item in [f'*{title_two}*', project_two])
+        return [project1.strip(), project2.strip()]
+
 def setup(job=None, level=None, industry=None):
     OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
