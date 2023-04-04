@@ -61,3 +61,7 @@ Here is a list of all the environmental variables used here:
 
 ## Note
 The bot is live [here](https://dataalchemist.onrender.com/). It is presently using my OpenAI api-key. Alternative options are under development.
+
+## Roadmap
+- [] Add the option to use this without webhook
+- [] Add a conversational and memory feature
