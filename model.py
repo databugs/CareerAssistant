@@ -3,10 +3,10 @@ from langchain.prompts import PromptTemplate
 from langchain.llms import OpenAI
 from pydantic import BaseModel, Field
 import os
-import logging
+#import logging
 
 # Set up logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
+#logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
 
 class ProjectIdeas(BaseModel):
     project_ideas: list[str] = Field(description="List of project ideas.")
