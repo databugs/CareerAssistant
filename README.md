@@ -48,6 +48,10 @@ The bot will ask for your job title, level, and Industry. It will then use the i
 ```
     pip install -r requirements.txt
 ```
+6. Start the server
+```
+    uvicorn main:app
+```
 ## Environmental Variables
 Here is a list of all the environmental variables used here:
 - **telegram token**: you need this to communicate with the telegram's api.
