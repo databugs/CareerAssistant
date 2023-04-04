@@ -35,7 +35,7 @@ def clean_output(output):
         project2 = ''.join(item +'\n\n' for item in [f'*{title_two}*', project_two])
         return [project1.strip(), project2.strip()]
 
-def setup(job=None, level=None, industry=None):
+def setup(job_title=None, level=None, industry=None):
     OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
     #output_parser = PydanticOutputParser(pydantic_object=ProjectIdeas)
@@ -70,5 +70,5 @@ def setup(job=None, level=None, industry=None):
 
     model = OpenAI(temperature=0.7, openai_api_key=OPENAI_API_KEY)
 
-    _input = prompt.format(job_title=job, level=level, industry=industry)
+    _input = prompt.format(job_title=job_title, level=level, industry=industry)
     return model(_input)
