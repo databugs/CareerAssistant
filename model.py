@@ -36,7 +36,6 @@ def clean_output(output):
         return [project1.strip(), project2.strip()]
 
 def setup(job=None, level=None, industry=None):
-    def setup(job=None, level=None, industry=None):
     OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
     #output_parser = PydanticOutputParser(pydantic_object=ProjectIdeas)
@@ -69,21 +68,7 @@ def setup(job=None, level=None, industry=None):
         partial_variables={"format_instructions": format_instructions}
     )
 
-    model = OpenAI(temperature=0.7)
+    model = OpenAI(temperature=0.7, openai_api_key=OPENAI_API_KEY)
 
     _input = prompt.format(job_title=job, level=level, industry=industry)
-    return model(_input)
-    """
-
-    prompt = PromptTemplate(
-        template=template,
-        input_variables=["job", "level", "industry"]
-    )
-
-    #logging.debug(f"Input variables: job_title={job}, level={level}, industry={industry}")
-
-    model = OpenAI(temperature=0.7, openai_api_key=OPENAI_API_KEY, max_tokens=1004)
-
-    _input = prompt.format(job=job, level=level, industry=industry)
-
     return model(_input)
