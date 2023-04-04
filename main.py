@@ -53,8 +53,8 @@ async def industry(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Save the industry and display the gathered information."""
     context.user_data['industry'] = update.message.text
     output = setup(job=context.user_data['job_title'], level=context.user_data['job_level'], industry=context.user_data['industry'])
-    list_of_ideas = custom_output_parser(output)
-    message = f'Here are 5 projects you can complete to take your career to the next level.\n\n{list_of_ideas[0]}\n\n{list_of_ideas[1]}\n\n{list_of_ideas[2]}\n\n{list_of_ideas[3]}\n\n{list_of_ideas[4]}\n\nGood Luck!'
+    list_of_ideas = output.strip()
+    message = f'Here are 2 projects you can complete to take your career to the next level.\n\n{list_of_ideas}\n\nGood Luck!'
     await update.message.reply_text(
         f"Here's the information I gathered: \nJob Title: {context.user_data['job_title'].title()}\nJob Level: {context.user_data['job_level'].title()}\nIndustry: {context.user_data['industry'].title()}\n\n{message}"
     )
