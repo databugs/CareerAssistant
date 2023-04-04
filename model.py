@@ -35,9 +35,9 @@ def setup(job=None, level=None, industry=None):
     actionable steps that the individual can take.
 
     Input Format:
-    {Job_title}
-    {Level}
-    {Industry}
+    {job}
+    {level}
+    {industry}
 
     Output Format:
 
@@ -70,13 +70,13 @@ def setup(job=None, level=None, industry=None):
 
     prompt = PromptTemplate(
         template=template,
-        input_variables=["job_title", "level", "industry"]
+        input_variables=["job", "level", "industry"]
     )
 
     #logging.debug(f"Input variables: job_title={job}, level={level}, industry={industry}")
 
     model = OpenAI(temperature=0.7, openai_api_key=OPENAI_API_KEY)
 
-    _input = prompt.format(job_title=job, level=level, industry=industry)
+    _input = prompt.format(job=job, level=level, industry=industry)
 
     return model(_input)
