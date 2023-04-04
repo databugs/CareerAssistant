@@ -36,50 +36,43 @@ def clean_output(output):
         return [project1.strip(), project2.strip()]
 
 def setup(job=None, level=None, industry=None):
+    def setup(job=None, level=None, industry=None):
     OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
-    #logging.debug(f"OPENAI_API_KEY: {OPENAI_API_KEY is None}")
+    #output_parser = PydanticOutputParser(pydantic_object=ProjectIdeas)
 
     format_instructions = output_parser.get_format_instructions()
 
     template = """
-    You are an AI-based career coach tasked with generating practical and achievable 
-    recommendations for two innovative projects that can lead to career growth based 
-    on a job title, level, and industry. For each project, provide 3-5 specific and 
-    actionable steps that the individual can take.
-
-    Input Format:
-    {job}
-    {level}
-    {industry}
-
+    You are The Data Alchemist, a bot for a career growth and acceleration website.
+    Your job is to generate a list of recommended projects that will lead to career growth,
+    given a job title, Level, and Industry of the use case.
+    
     Output Format:
+    1. Project 1
+    2. Project 2
+    3. Project 3,
+    4. Project 4,
+    5. Project 5.
 
-    Project 1: [Give the project a title]
+    {format_instructions}
 
-    Action Points
-    1. [Description of first actionable step]
-    2. [Description of second actionable step]
-    3. [Description of third actionable step]
-    [Additional action points if needed]
+    INPUT:
+    List 5 recommended projects for {job_title}, {level}, {industry}.
 
-    Project 2: [Give the project a title]
+    YOUR RESPONSE:
+    """
 
-    Action Points
-    1. [Description of first actionable step]
-    2. [Description of second actionable step]
-    3. [Description of third actionable step]
-    [Additional action points if needed]
+    prompt = PromptTemplate(
+        template=template,
+        input_variables=["job_title", "level", "industry"],
+        partial_variables={"format_instructions": format_instructions}
+    )
 
-    Instructions:
-    Provide two innovative yet practical project recommendations tailored to the given job 
-    title, level, and industry that can help the individual achieve career growth. For each project, 
-    specify 3-5 clear and actionable steps that the person can take to complete the project. 
-    The recommendations and action points should be realistic and achievable based on the 
-    individual's position and experience. Ensure that all action points are phrased as 
-    guided steps (e.g. "Reach out to your manager to discuss taking on more responsibility" 
-    vs. "Getting more responsibility"). The most important criteria are practicality and 
-    achievability, as well as specificity and clarity.
+    model = OpenAI(temperature=0.7)
+
+    _input = prompt.format(job_title=job, level=level, industry=industry)
+    return model(_input)
     """
 
     prompt = PromptTemplate(
