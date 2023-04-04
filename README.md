@@ -51,9 +51,9 @@ The bot will ask for your job title, level, and Industry. It will then use the i
 ## Environmental Variables
 Here is a list of all the environmental variables used here:
 - **telegram token**: you need this to communicate with the telegram's api.
-- **openai api-key**: you need this to use to interact with all the text models they provide.
-- secret-token: this token helps us to validate that the update we are recieving is in fact coming from our bot.
-- webhook url: all updates from telegram are sent to this url.
+- **openai api-key**: you need this to to interact with all the text models they provide.
+- **secret-token**: this token helps us to validate that the update we are recieving is in fact coming from our bot.
+- **webhook url**: all updates from telegram are sent to this url.
 
 ## Note
 The bot is live [here](https://dataalchemist.onrender.com/). It is presently using my OpenAI api-key. Alternative options are under development.
